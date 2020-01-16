@@ -46,20 +46,40 @@ resources:
     type: OS::Neutron::Subnet
     properties:
       network: { get_resource: red_net }
-      cidr: 10.220.0.0/24
+      cidr: 200.0.0.0/5
       dns_nameservers:
         - 10.101.255.254
-      gateway_ip: 10.220.0.254
+      gateway_ip: 207.255.255.254 
   red_gateway_port:
     type: OS::Neutron::Port
     properties:
       network: { get_resource: red_net }
       fixed_ips:
-        - ip_address: 10.220.0.254
-  red_zun_port:
+        - ip_address: 207.255.255.254 
+  kali_1_port:
     type: OS::Neutron::Port
     properties:
       network: { get_resource: red_net }
+      fixed_ips:
+        - ip_address: 205.140.100.1
+  kali_2_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: red_net }
+      fixed_ips:
+        - ip_address: 207.192.153.100       
+  kali_3_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: red_net }
+      fixed_ips:
+        - ip_address: 202.10.153.4
+  kali_4_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: red_net }
+      fixed_ips:
+        - ip_address: 200.225.109.3
 
 ## Enterprise Network
   green_net:
@@ -202,25 +222,7 @@ resources:
     properties:
       signal_transport: TOKEN_SIGNAL
 
-## Testing zun container in stack
-## bug report opened for serial display on zun-created containers
-##  kali_container:
-##    type: OS::Zun::Container
-##    properties:
-##      name: kali
-##      workdir: /root
-##      image: "kalilinux/kali-rolling:latest"
-##      image_driver: docker
-##      command: /bin/bash
-##      hostname: kali
-##      cpu: 1
-##      interactive: true
-##      memory: 512
-##      networks:
-##        - port: { get_resource: red_zun_port }
-
 ## Box serves as core router and SO heavy node
-## Need way to signal master completion and pause/resume establishment of heavy node
   gateway:
     type: OS::Nova::Server
     properties:
@@ -249,7 +251,7 @@ resources:
             iface lo inet loopback
             auto ens3
             iface ens3 inet static
-            address 10.220.0.254/24
+            address 223.255.255.254/24
             auto ens4
             iface ens4 inet static
             address 10.221.0.254/24
@@ -276,17 +278,17 @@ resources:
             iptables -A FORWARD -i ens$num -o ens7 -j ACCEPT
             done
 
-            ## Allow web and ftp traffic red net to DMZ
+            ## Allow red net to DMZ
             iptables -A FORWARD -p icmp -i ens3 -o ens5 -j ACCEPT
             iptables -A FORWARD -p icmp -i ens5 -o ens3 -j ACCEPT
-            iptables -A FORWARD -p tcp -m multiport --dport 20,21,22,23,80,445 -i ens3 -o ens5 -j ACCEPT
+            iptables -A FORWARD -p tcp -m multiport --dport 20,21,22,80 -i ens3 -o ens5 -j ACCEPT
             iptables -A FORWARD -p tcp -i ens5 -o ens3 -m state --state RELATED,ESTABLISHED -j ACCEPT 
             
             ## Allow SSH between dmz & blue net
-            iptables -A FORWARD -p tcp --dport ssh -i ens5 -o ens6 -m state --state RELATED,ESTABLISHED -j ACCEPT
+            iptables -A FORWARD -p tcp --dport ssh -i ens6 -o ens5 -m state --state RELATED,ESTABLISHED -j ACCEPT
             
             ## Allow blue net to DMZ + Enterprise
-            for num in {3..5}
+            for num in {4..5}
             do
             iptables -A FORWARD -i ens6 -o ens$num -j ACCEPT
             iptables -A FORWARD -i ens$num -o ens6 -m state --state RELATED,ESTABLISHED -j ACCEPT
@@ -415,6 +417,7 @@ resources:
             nc -l 12345 -q 5
             sosetup -yf /root/sosetup.conf
             ufw disable
+            mkdir /TRA_Pcaps
             wget https://github.com/GA-CyberWorkforceAcademy/metaTest/raw/master/pcaps/EK1.pcap -O /TRA_Pcaps/EK1.pcap
             wget https://github.com/GA-CyberWorkforceAcademy/metaTest/raw/master/pcaps/EK2.pcap -O /TRA_Pcaps/EK2.pcap
             wget https://github.com/GA-CyberWorkforceAcademy/metaTest/raw/master/pcaps/EK3.pcap -O /TRA_Pcaps/EK3.pcap
@@ -529,31 +532,116 @@ resources:
             $userpass: { get_param: userpass }
             $sopass: { get_param: sopass }
 
-  kali_workstations:
-    type: OS::Heat::ResourceGroup
-    depends_on: wait_for_gateway_networking
+  kali_1:
+    type: OS::Nova::Server
     properties:
-##Increase count to 5 for group event
-      count: 1
-      resource_def:
-        type: OS::Nova::Server
-        properties:
-          name: penTest-Host
-          flavor: hack.massive
-          networks:
-            - network: { get_resource: red_net }
-          image: Kali Rolling
-          user_data_format: RAW
-          user_data: |
-            #!/bin/bash
-            echo "root:toor" | chpasswd
-            apt-get update 
-            apt-get install gem ruby-dev
-            git clone https://github.com/iagox86/dnscat2.git
-            cd dnscat2/server/
-            gem install bundler
-            bundle install
-        
+      name: Kali-1
+      flavor: hack.massive
+      networks:
+        - port: { get_resource: kali_1_port }
+      image: Kali Rolling
+      user_data_format: RAW
+      user_data: |
+        #!/bin/bash
+        echo "root:toor" | chpasswd
+        apt-get update
+        apt-get install gem ruby-dev
+        git clone https://github.com/iagox86/dnscat2.git
+        cd dnscat2/server/
+        gem install bundler
+        bundle install 
+        cat > "/etc/apt/sources.list" << __EOF__
+        deb http://http.kali.org/kali kali-rolling main non-free contrib
+        deb-src http://http.kali.org/kali kali-rolling main non-free contrib
+        __EOF__ 
+  kali_2:
+    type: OS::Nova::Server
+    properties:
+      name: Kali-2
+      flavor: hack.massive
+      networks:
+        - port: { get_resource: kali_2_port }
+      image: Kali Rolling
+      user_data_format: RAW
+      user_data: |
+        #!/bin/bash
+        echo "root:toor" | chpasswd
+        apt-get update
+        apt-get install gem ruby-dev
+        git clone https://github.com/iagox86/dnscat2.git
+        cd dnscat2/server/
+        gem install bundler
+        bundle install 
+        cat > "/etc/apt/sources.list" << __EOF__
+        deb http://http.kali.org/kali kali-rolling main non-free contrib
+        deb-src http://http.kali.org/kali kali-rolling main non-free contrib
+        __EOF__
+  kali_3:
+    type: OS::Nova::Server
+    properties:
+      name: Kali-3
+      flavor: hack.massive
+      networks:
+        - port: { get_resource: kali_3_port }
+      image: Kali Rolling
+      user_data_format: RAW
+      user_data: |
+        #!/bin/bash
+        echo "root:toor" | chpasswd
+        apt-get update
+        apt-get install gem ruby-dev
+        git clone https://github.com/iagox86/dnscat2.git
+        cd dnscat2/server/
+        gem install bundler
+        bundle install 
+        cat > "/etc/apt/sources.list" << __EOF__
+        deb http://http.kali.org/kali kali-rolling main non-free contrib
+        deb-src http://http.kali.org/kali kali-rolling main non-free contrib
+        __EOF__
+  kali_4:
+    type: OS::Nova::Server
+    properties:
+      name: Kali-4
+      flavor: hack.massive
+      networks:
+        - port: { get_resource: kali_4_port }
+      image: Kali Rolling
+      user_data_format: RAW
+      user_data: |
+        #!/bin/bash
+        echo "root:toor" | chpasswd
+        apt-get update
+        apt-get install gem ruby-dev
+        git clone https://github.com/iagox86/dnscat2.git
+        cd dnscat2/server/
+        gem install bundler
+        bundle install 
+        cat > "/etc/apt/sources.list" << __EOF__
+        deb http://http.kali.org/kali kali-rolling main non-free contrib
+        deb-src http://http.kali.org/kali kali-rolling main non-free contrib
+        __EOF__
+  kali_extra:
+    type: OS::Nova::Server
+    properties:
+      name: Kali-extra
+      flavor: hack.massive
+      networks:
+        - network: { get_resource: red_net }
+      image: Kali Rolling
+      user_data_format: RAW
+      user_data: |
+        #!/bin/bash
+        echo "root:toor" | chpasswd
+        apt-get update
+        apt-get install gem ruby-dev
+        git clone https://github.com/iagox86/dnscat2.git
+        cd dnscat2/server/
+        gem install bundler
+        bundle install 
+        cat > "/etc/apt/sources.list" << __EOF__
+        deb http://http.kali.org/kali kali-rolling main non-free contrib
+        deb-src http://http.kali.org/kali kali-rolling main non-free contrib
+        __EOF__        
 
   ms3_ubuntu:
     type: OS::Nova::Server
@@ -592,7 +680,6 @@ resources:
             "metasploitable::sinatra",
             "metasploitable::chatbot",
             "metasploitable::payroll_app",
-            "metasploitable::knockd",
             "metasploitable::iptables"
             ]
             }
@@ -773,10 +860,6 @@ resources:
                 Invoke-WebRequest -Uri https://github.com/ytisf/theZoo/raw/master/malwares/Binaries/Ransomware.Jigsaw/Ransomware.Jigsaw.zip -Outfile c:\jigsaw.zip
                 Invoke-WebRequest -Uri https://github.com/ytisf/theZoo/raw/master/malwares/Binaries/Ransomware.Cerber/Ransomware.Cerber.zip -Outfile c:\cerber.zip
                 Invoke-WebRequest -Uri https://github.com/ytisf/theZoo/raw/master/malwares/Binaries/Win32.KeyPass/Win32.KeyPass.zip -Outfile c:\keypass.zip
-                Expand-Archive -LiteralPath c:\jigsaw.zip -DestinationPath c:\RSdll
-                Expand-Archive -LiteralPath c:\cerber.zip -DestinationPath c:\RSdll
-                Expand-Archive -LiteralPath c:\keypass.zip -DestinationPath c:\RSdll
-                Remove-Item –path c:\ -include *.zip
                 Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-3.9.5-1.msi -Outfile c:\wazuh.msi
                 start-process c:\wazuh.msi -ArgumentList 'ADDRESS="so_master_address" AUTHD_SERVER="so_master_address" /passive' -wait
                 
@@ -812,7 +895,7 @@ resources:
     depends_on: blue_net
     properties:
 ##Increase count to 15 for group event
-      count: 1
+      count: 5
       resource_def:
         type: OS::Nova::Server
         properties:
