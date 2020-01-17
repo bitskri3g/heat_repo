@@ -643,11 +643,11 @@ resources:
         deb-src http://http.kali.org/kali kali-rolling main non-free contrib
         __EOF__        
 
-  ms3_ubuntu:
+  DMZ_server:
     type: OS::Nova::Server
     depends_on: wait_for_gateway_networking
     properties:
-      name: Ubuntu Workstation
+      name: DMZ-Server
       flavor: cy.large
       networks:
         - port: { get_resource: white_server_port }
@@ -658,6 +658,8 @@ resources:
           template: |
             #!/bin/bash
             echo "root:toor" | chpasswd
+            echo "Vanessa_Cohen:Y71N1" | chpasswd
+            echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
             # --- install modified metasploitable3
             echo "Setup Metasploitable3"
             apt-get install -y curl git
