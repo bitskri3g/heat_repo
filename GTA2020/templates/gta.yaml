@@ -331,7 +331,7 @@ resources:
           user_data_format: RAW
           user_data:
             str_replace:
-              template: {get_file : "https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/lan_host.sh"}
+              template: {get_file : "https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/lan_host.ps1"}
               params:
                 admin_password: { get_param: domainpass }
                 domain_name: { get_param: domain_name }
