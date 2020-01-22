@@ -1,3 +1,5 @@
+heat_template_version: rocky
+description: Georgia Technology Authority Event 2020
 #############################################################
 ## Index 
 ##
@@ -11,11 +13,6 @@
 ## 4.0- DMZ Resources
 ## 5.0- Red Team Resources
 #############################################################
-
-heat_template_version: rocky
-
-description: Georgia Technology Authority Event 2020
-
 parameters:
 
   username:
