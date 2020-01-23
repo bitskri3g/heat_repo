@@ -1,6 +1,7 @@
 #ps1_sysnative
 $ErrorActionPreference = 'Stop'
 $domain = "domain_name"
+$computer = $env:computername
 $password = "admin_password" | ConvertTo-SecureString -asPlainText -Force
 $username = "$domain\administrator"
 $credential = New-Object System.Management.Automation.PSCredential -ArgumentList ($username,$password)
@@ -20,11 +21,11 @@ $break = $false
 [int]$attempt = "0"
 do {
   try {
-    Add-Computer -DomainName $domain -LocalCredential $credential -Credential $credential
+    Add-Computer -ComputerName $name -DomainName $domain -LocalCredential $credential -Credential $credential -Restart -Force
     $break = $true
   }
   catch {
-    if ($attempt -gt 25){
+    if ($attempt -gt 10){
       Write-Host "Could not join domain!"
       $break = $true
     }
