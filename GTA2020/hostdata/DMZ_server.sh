@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "root:toor" | chpasswd
 echo "Vanessa_Cohen:Y71N1" | chpasswd
-echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 # --- install modified metasploitable3
 echo "Setup Metasploitable3"
 apt-get install -y curl git
