@@ -1,9 +1,9 @@
 #!/bin/bash
 echo "root:toor" | chpasswd
-echo "Vanessa_Cohen:Y71N1" | chpasswd
+## --allow ssh login with password based authentication
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 service ssh restart
-# --- install modified metasploitable3
+# --install modified metasploitable3
 echo "Setup Metasploitable3"
 apt-get install -y curl git
 git clone https://github.com/GA-CyberWorkforceAcademy/metaTest.git
@@ -30,19 +30,22 @@ cat > "/metaTest/chef/cookbooks/ms3.json" << __EOF__
 }
 __EOF__
 chef-solo -j /metaTest/chef/cookbooks/ms3.json --config-option cookbook_path=/metaTest/chef/cookbooks
-## msf cookbook disables all non-tcp connections - disable iptables completely per request
+## --msf cookbook disables all non-tcp connections - disable iptables completely per request
 service iptables-persistent flush
 update-rc.d -f iptables-persistent remove
 
-## install wazuh
+## --install wazuh
 apt-get install curl apt-transport-https lsb-release
 curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | apt-key add -
 echo "deb https://packages.wazuh.com/3.x/apt/ stable main" | tee /etc/apt/sources.list.d/wazuh.list
 apt-get update && apt-get install wazuh-agent -y
 /var/ossec/bin/agent-auth -m $so_master_address
+## --install dnscat2 client
 git clone https://github.com/iagox86/dnscat2.git
 cd dnscat2/client/
 make
-
+## --verify password for Sys Admin
+echo "Vanessa_Cohen:Y71N1" | chpasswd
+# --signals completion
 $signal_ms3_complete
 exit 1001
