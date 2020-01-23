@@ -1,5 +1,10 @@
 #!/bin/bash
+##-- setup users
 echo "root:toor" | chpasswd
+useradd Adam_Garrett -U -m -s /bin/bash
+useradd Vanessa_Cohen -U -m -s /bin/bash
+echo "Adam_Garrett:CphTH" | chpasswd
+echo "Vanessa_Cohen:Y71N1" | chpasswd
 ## --allow ssh login with password based authentication
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 service ssh restart
@@ -44,8 +49,6 @@ apt-get update && apt-get install wazuh-agent -y
 git clone https://github.com/iagox86/dnscat2.git
 cd dnscat2/client/
 make
-## --verify password for Sys Admin
-echo "Vanessa_Cohen:Y71N1" | chpasswd
 # --signals completion
 $signal_ms3_complete
 exit 1003
