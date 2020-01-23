@@ -2,6 +2,7 @@
 echo "root:toor" | chpasswd
 echo "Vanessa_Cohen:Y71N1" | chpasswd
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+service ssh restart
 # --- install modified metasploitable3
 echo "Setup Metasploitable3"
 apt-get install -y curl git
