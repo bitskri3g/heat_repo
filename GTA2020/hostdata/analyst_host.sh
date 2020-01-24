@@ -6,8 +6,6 @@ echo 10.222.0.15 home.gmips.gov >> /etc/hosts
 echo 202.10.153.4 pwned_you_good.net >> /etc/hosts
 apt-get -y update && apt-get install -y gtk2.0 build-essential git wireshark nmap xrdp
 git clone https://github.com/vanhauser-thc/thc-hydra.git && cd thc-hydra && ./configure && make install
-#---INSTALL NESSUS FROM DOWNLOAD
-dpkg -i Nessus-8.8.0-debian6_amd64.deb
 #---CREATE CLIENT USER
 useradd analyst -m -U -s /bin/bash; usermod -aG sudo analyst
 echo 'root:gmips123' | chpasswd; echo 'analyst:gmips123' | chpasswd
