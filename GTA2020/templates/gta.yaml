@@ -29,7 +29,7 @@ parameters:
     type: string
     label: Domain Safe Mode Password
     description: Domain administrator password
-    default: P@$$word123
+    default: P@ssword123
   domain_name:
     type: string
     label: Domain Name
