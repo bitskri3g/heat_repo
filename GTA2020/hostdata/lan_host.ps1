@@ -51,4 +51,4 @@ exit 1003
 }
 
 ## after reboot, run traffic generator
-c:/noisy.pr --config config.json
+c:/noisy.py --config config.json
