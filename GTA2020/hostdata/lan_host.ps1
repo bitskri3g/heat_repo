@@ -1,4 +1,5 @@
 #ps1_sysnative
+
 if (!(Test-Path setup_done)) {
 $domainprefix = "domain_netbios_name"
 $domain = "domain_name"
@@ -50,6 +51,10 @@ New-Item -ItemType file setup_done
 exit 1003
 }
 
-## after reboot, run traffic generator
+do {
+## run traffic generator
 cd c:\
 .\noisy.py --config config.json
+}
+  
+exit 1002
