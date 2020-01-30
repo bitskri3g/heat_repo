@@ -49,12 +49,9 @@ do {
 While ($break -eq $false)
 New-Item -ItemType file setup_done
 exit 1003
-}
-
-do {
+} Else {
 ## run traffic generator
 cd c:\
-.\noisy.py --config config.json
-}
-  
+.\noisy.py --config config.json  
 exit 1002
+}
