@@ -1,6 +1,5 @@
 #ps1_sysnative
 if (!(Test-Path setup_done)) {
-$ErrorActionPreference = 'Stop'
 $domainprefix = "domain_netbios_name"
 $domain = "domain_name"
 $computer = "$env:computername"
@@ -18,9 +17,10 @@ Invoke-WebRequest -Uri 'https://packages.wazuh.com/3.x/windows/wazuh-agent-3.9.5
 start-process c:\wazuh.msi -ArgumentList 'ADDRESS="so_master_address" AUTHD_SERVER="so_master_address" /passive' -wait
 ## install python3
 Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.7.0/python-3.7.0.exe' -Outfile 'c:\python-3.7.0.exe'
-c:/python-3.7.0.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
+cd c:\
+.\python-3.7.0.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
 ## install requests library with pip
-cd 'c:/Program Files (x86)/Python37-32/Scripts'
+cd 'c:\Program Files (x86)/Python37-32/Scripts'
 pip install requests
 ## download python script and config file
 Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/metaTest/master/TrafficGen/noisy.py' -Outfile 'c:\noisy.py'
@@ -51,4 +51,5 @@ exit 1003
 }
 
 ## after reboot, run traffic generator
-c:/noisy.py --config config.json
+cd c:\
+.\noisy.py --config config.json
