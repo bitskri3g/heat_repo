@@ -1,6 +1,5 @@
 #ps1_sysnative
-
-if (!(Test-Path setup_done)) {
+if (!(Test-Path domain_done)) {
 $domainprefix = "domain_netbios_name"
 $domain = "domain_name"
 $computer = "$env:computername"
@@ -47,11 +46,15 @@ do {
   }
 }
 While ($break -eq $false)
-New-Item -ItemType file setup_done
+New-Item -ItemType file domain_done
 exit 1003
-} Else {
+}
 ## run traffic generator
+
+if (!(Test-Path traffic_gen)) {
 cd c:\
 .\noisy.py --config config.json  
+New-Item -ItemType file traffic_gen
 exit 1002
 }
+Echo " script complete"
