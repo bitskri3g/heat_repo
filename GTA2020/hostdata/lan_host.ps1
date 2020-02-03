@@ -47,14 +47,5 @@ do {
 }
 While ($break -eq $false)
 New-Item -ItemType file domain_done
-exit 1003
+exit 1001
 }
-## run traffic generator
-
-if (!(Test-Path traffic_gen)) {
-cd c:\
-.\noisy.py --config config.json  
-New-Item -ItemType file traffic_gen
-}
-Echo "script complete"
-exit 0
