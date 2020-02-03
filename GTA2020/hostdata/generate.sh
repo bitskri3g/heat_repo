@@ -16,3 +16,5 @@ do
   tcprewrite --endpoints=1.2.3.4:4.3.2.1 --infile=$pcap --outfile=$pcap.addresses --cache=$pcap.cache
   editcap -t 154000000 $pcap.addresses $pcap.addresses.time
 done
+
+tcpreplay -i eth0 1.pcap.addresses.time
