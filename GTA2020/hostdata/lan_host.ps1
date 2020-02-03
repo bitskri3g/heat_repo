@@ -55,6 +55,6 @@ if (!(Test-Path traffic_gen)) {
 cd c:\
 .\noisy.py --config config.json  
 New-Item -ItemType file traffic_gen
-exit 1002
 }
-Echo " script complete"
+Echo "script complete"
+exit 0
