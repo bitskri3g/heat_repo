@@ -335,7 +335,7 @@ resources:
               params:
                 admin_password: { get_param: domainpass }
                 domain_name: { get_param: domain_name }
-                domain_netbios_name: { get_para: domain_netbios_name }
+                domain_netbios_name: { get_param: domain_netbios_name }
                 so_master_address: { get_attr: [blue_master_port, fixed_ips, 0, ip_address] }
 
 ## 4.0 DMZ Resources
