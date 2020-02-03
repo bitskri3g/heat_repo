@@ -1,11 +1,37 @@
 #ps1_sysnative
+$ErrorActionPreference = 'Stop'
+
 if (!(Test-Path domain_done)) {
 $domainprefix = "domain_netbios_name"
 $domain = "domain_name"
-$computer = "$env:computername"
 $password = "admin_password" | ConvertTo-SecureString -asPlainText -Force
 $username = "$domainprefix\administrator"
 $credential = New-Object System.Management.Automation.PSCredential -ArgumentList($username,$password)
+## First boot of new DC takes awhile.. try until success for up to 10 minutes.
+$break = $false
+[int]$attempt = "0"
+do {
+  try {
+    Add-Computer -DomainName $domain -Credential $credential
+    $break = $true
+  }
+  catch {
+    if ($attempt -gt 10){
+      Write-Host "Could not join domain!"
+      $break = $true
+    }
+    else {
+      Write-Host "Join failed... retrying"
+      Start-Sleep -Seconds 60
+      $attempt = $attempt + 1
+    }
+  }
+}
+While ($break -eq $false)
+New-Item -ItemType file domain_done
+exit 1001
+}
+
 net user /add administrator $password /y
 net localgroup administrators /add administrator
 net user guest /active:yes
@@ -25,36 +51,3 @@ pip install requests
 ## download python script and config file
 Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/metaTest/master/TrafficGen/noisy.py' -Outfile 'c:\noisy.py'
 Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/metaTest/master/TrafficGen/config.json' -Outfile 'c:\config.json'
-## First boot of new DC takes awhile.. try until success for up to 10 minutes.
-$break = $false
-[int]$attempt = "0"
-do {
-  try {
-    Add-Computer -ComputerName $computer -DomainName $domain -Credential $credential
-    $break = $true
-  }
-  catch {
-    if ($attempt -gt 10){
-      Write-Host "Could not join domain!"
-      $break = $true
-    }
-    else {
-      Write-Host "Join failed... retrying"
-      Start-Sleep -Seconds 60
-      $attempt = $attempt + 1
-    }
-  }
-}
-While ($break -eq $false)
-New-Item -ItemType file domain_done
-exit 1003
-}
-## run traffic generator
-
-if (!(Test-Path traffic_gen)) {
-cd c:\
-.\noisy.py --config config.json  
-New-Item -ItemType file traffic_gen
-exit 1002
-}
-Echo " script complete"
