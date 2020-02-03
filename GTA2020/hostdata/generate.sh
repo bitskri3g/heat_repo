@@ -1,7 +1,9 @@
 #!/bin/bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 apt update
-apt install tcpreplay tcpdump wget -y
+apt install tcpreplay tshark wget -y
 
 #test w single pcap
 wget https://download.netresec.com/pcap/ists-12/2015-03-07/snort.log.1425741002 -O 1.pcap
