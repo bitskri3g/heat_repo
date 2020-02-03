@@ -1,5 +1,5 @@
 #ps1_sysnative
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Continue'
 
 if (!(Test-Path domain_done)) {
 $domainprefix = "domain_netbios_name"
