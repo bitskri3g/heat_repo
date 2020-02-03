@@ -2,6 +2,8 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+echo "root:toor" | chpasswd
+
 apt update
 apt install tcpreplay tshark wget -y
 
