@@ -279,6 +279,7 @@ resources:
   traffic_generators:
     type: OS::Heat::ResourceGroup
     depends_on: wait_for_gateway_networking
+    properties:
       count: 10
       resource_def:
         type: OS::Zun::Container
