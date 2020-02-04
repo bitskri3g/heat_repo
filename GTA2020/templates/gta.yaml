@@ -85,7 +85,7 @@ resources:
       - analyst_workstations
     properties:
       floating_network: Public
-      port_id: { get_attr: [analyst_workstations, resource.0, addresses, blue_net, 0, port] }
+      port_id: { get_attr: [analyst_workstations, resource.0, addresses, get_resource: blue_net, 0, port] }
 
 ## 1.1 Enterprise Network
   green_net:
