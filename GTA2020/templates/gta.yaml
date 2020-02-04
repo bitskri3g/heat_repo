@@ -77,17 +77,15 @@ resources:
       network: { get_resource: blue_net }
       fixed_ips:
         - ip_address: 10.223.0.250
-  analyst_floats:
-    type: OS::Heat::ResourceGroup
+
+  analyst_float_1:
+    type: OS::Neutron::FloatingIP
     depends_on:
       - blue_net
       - analyst_workstations
     properties:
-      count: { get_param: analysts }
-      resource_def:
-        type: OS::Neutron::FloatingIP
-        properties:
-          floating_network: Public
+      floating_network: Public
+      port_id: { get_attr: [analyst_workstations, resource.1, addresses, blue_net, 0, port] }
 
 ## 1.1 Enterprise Network
   green_net:
@@ -320,8 +318,7 @@ resources:
           image: Debian LXQt
           name: analyst-%index%
           networks:
-            - network: {get_resource: blue_net}
-            - floating_ip: { get_attr: [analyst_floats, resource.0] }
+            - network: { get_resource: blue_net }
           user_data: {get_file : "https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh"}
           user_data_format: RAW
 
