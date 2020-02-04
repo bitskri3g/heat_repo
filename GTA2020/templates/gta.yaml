@@ -46,13 +46,12 @@ parameters:
     description: Password for the 'so' user on both so_master and so_gateway
     default: so
   analysts:
-    type: integer
+    type: number
     label: number of analysts
     description: Number of anaylst VMs and floating IPs to create
     default: 2
 
 resources:
-
 ## 1.0 Blue Team Network
   blue_net:
     type: OS::Neutron::Net
@@ -79,15 +78,16 @@ resources:
       fixed_ips:
         - ip_address: 10.223.0.250
   analyst_floats:
-    type: OS::Heat:ResourceGroup
-    depends_on: blue_net
+    type: OS::Heat::ResourceGroup
+    depends_on:
+      - blue_net
+      - analyst_workstations
     properties:
       count: { get_param: analysts }
       resource_def:
         type: OS::Neutron::FloatingIP
-          properties:
-            floating_network: Public
-            name: float-%index%
+        properties:
+          floating_network: Public
 
 ## 1.1 Enterprise Network
   green_net:
@@ -318,10 +318,10 @@ resources:
         properties:
           flavor: cy.mega
           image: Debian LXQt
-          name: analyst %index%
+          name: analyst-%index%
           networks:
-          - network: {get_resource: blue_net}
-          - floating_ip: { get_resource: float-%index% }
+            - network: {get_resource: blue_net}
+            - floating_ip: { get_attr: [analyst_floats, resource.0] }
           user_data: {get_file : "https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh"}
           user_data_format: RAW
 
