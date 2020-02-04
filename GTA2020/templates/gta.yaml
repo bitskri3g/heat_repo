@@ -78,14 +78,14 @@ resources:
       fixed_ips:
         - ip_address: 10.223.0.250
 
-  analyst_float_1:
+  analyst_float_0:
     type: OS::Neutron::FloatingIP
     depends_on:
       - blue_net
       - analyst_workstations
     properties:
       floating_network: Public
-      port_id: { get_attr: [analyst_workstations, resource.1, addresses, blue_net, 0, port] }
+      port_id: { get_attr: [analyst_workstations, resource.0, addresses, blue_net, 0, port] }
 
 ## 1.1 Enterprise Network
   green_net:
