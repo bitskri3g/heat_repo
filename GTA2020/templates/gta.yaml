@@ -276,17 +276,20 @@ resources:
             $userpass: { get_param: userpass }
             $sopass: { get_param: sopass }
 
-  traffic_generator:
-    type: OS::Zun::Container
-    depends_on: wait_for_gateway_networking    
-    properties:
-      name: traffic_generator
-      image: "danielkvist/whisperer"
-      image_driver: docker
-      cpu: 1
-      memory: 512
-      networks:
-        - network: { get_resource: green_net }
+  traffic_generators:
+    type: OS::Heat::ResourceGroup
+    depends_on: wait_for_gateway_networking
+      count: 10
+      resource_def:
+        type: OS::Zun::Container
+        properties:
+          name: traffic generator %index%
+          image: "danielkvist/whisperer"
+          image_driver: docker
+          cpu: 1
+          memory: 512
+          networks:
+            - network: { get_resource: green_net }
 
   analyst_workstations:
     type: OS::Heat::ResourceGroup
