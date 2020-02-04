@@ -28,6 +28,10 @@ for num in {3..6};do dhclient -r ens$num ; ifdown ens$num ; ip route delete defa
 sysctl -w net.ipv4.ip_forward=1
 echo net.ipv4.ip_forward=1 >> /etc/sysctl.conf
 
+## adjust threshold to avoid softlocks for ancient kernel
+sysctl -w kernel.watchdog_thresh=20
+echo kernel.watchdog_thresh=20 >> /etc/sysctl.conf
+
 ## NAT Stuff
 ## By default, only allow communication out of gateway - no inter-net comms
 iptables -t nat -A POSTROUTING -o ens7 -j MASQUERADE
@@ -41,7 +45,7 @@ done
 iptables -A FORWARD -p icmp -i ens3 -o ens5 -j ACCEPT
 iptables -A FORWARD -p icmp -i ens5 -o ens3 -j ACCEPT
 iptables -A FORWARD -p tcp -m multiport --dport 20,21,22,80 -i ens3 -o ens5 -j ACCEPT
-iptables -A FORWARD -p tcp -i ens5 -o ens3 -m state --state RELATED,ESTABLISHED -j ACCEPT 
+iptables -A FORWARD -p tcp -i ens5 -o ens3 -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 ## Allow SSH between dmz & blue net
 iptables -A FORWARD -p tcp --dport ssh -i ens6 -o ens5 -m state --state RELATED,ESTABLISHED -j ACCEPT

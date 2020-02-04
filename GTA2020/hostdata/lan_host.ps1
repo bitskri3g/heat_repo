@@ -1,5 +1,5 @@
 #ps1_sysnative
-$ErrorActionPreference = 'Continue'
+$ErrorActionPreference = 'Stop'
 
 if (!(Test-Path domain_done)) {
 $domainprefix = "domain_netbios_name"
@@ -13,6 +13,7 @@ $break = $false
 do {
   try {
     Add-Computer -DomainName $domain -Credential $credential
+    New-Item -ItemType file domain_done
     $break = $true
   }
   catch {
@@ -28,8 +29,7 @@ do {
   }
 }
 While ($break -eq $false)
-New-Item -ItemType file domain_done
-exit 1001
+exit 1003
 }
 
 net user /add administrator $password /y
@@ -51,3 +51,4 @@ pip install requests
 ## download python script and config file
 Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/metaTest/master/TrafficGen/noisy.py' -Outfile 'c:\noisy.py'
 Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/metaTest/master/TrafficGen/config.json' -Outfile 'c:\config.json'
+exit 1001
