@@ -278,6 +278,7 @@ resources:
 
   traffic_generator:
     type: OS::Zun::Container
+    depends_on: wait_for_gateway_networking    
     properties:
       name: traffic_generator
       image: "danielkvist/whisperer"
