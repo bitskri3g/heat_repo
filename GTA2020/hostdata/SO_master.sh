@@ -3,6 +3,10 @@
 ## Set password for so user
 echo "so:$sopass" | chpasswd
 
+## adjust threshold to avoid softlocks for ancient kernel
+sysctl -w kernel.watchdog_thresh=20
+echo kernel.watchdog_thresh=20 >> /etc/sysctl.conf
+
 mkdir -p /home/so/.ssh/ && touch /home/so/.ssh/authorized_keys
 cat > "/home/so/.ssh/authorized_keys" << __EOF__
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+b7ZqtHdB6qzqwbQJ15V3l7p4QvOkWc5JkZeVmEqyOUY4rv2mUaU7dc1IuRGOD7VWGAC0VDjAZ/sN/YP0zXKTJRQILoxJtU/T9uBvOLwPexfucaOs4748+mUOgWcpwUVXxg7CqHA0Hg4P/ozkCqE8OBCjbgAKI3UMJ96LJW2K4E4juwK65ctV4SU+JtYycPpERXBCSz3l4fjJdZOqIQ2dRruYp25jWGPvd5X3dR1As0sqRzEBvvPAPPg/WM4N4IlfaOEGkdLDjIiP7KdNwDMj4rZEn3Zy/RWkpwJo1WjGK6t7cN+jJaqIkBDboPqGgftT2hc/QtFRB63guUL5Hlen
