@@ -47,6 +47,10 @@ iptables -A FORWARD -p icmp -i ens5 -o ens3 -j ACCEPT
 iptables -A FORWARD -p tcp -m multiport --dport 20,21,22,80 -i ens3 -o ens5 -j ACCEPT
 iptables -A FORWARD -p tcp -i ens5 -o ens3 -m state --state RELATED,ESTABLISHED -j ACCEPT
 
+## Allow red to smb share
+iptables -A FORWARD -p tcp --dport 445 -i ens3 -o ens4 -j ACCEPT
+iptables -A FORWARD -p tcp -i ens4 -o ens3 -m state --state RELATED,ESTABLISHED -j ACCEPT
+
 ## Allow SSH between dmz & blue net
 iptables -A FORWARD -p tcp --dport ssh -i ens6 -o ens5 -m state --state RELATED,ESTABLISHED -j ACCEPT
 
