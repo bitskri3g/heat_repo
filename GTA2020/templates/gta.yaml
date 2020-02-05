@@ -73,6 +73,7 @@ resources:
       fixed_ips:
         - ip_address: 10.223.0.250
 
+## allow-all security group for analyst routable addresses
   analyst_group:
     type: OS::Neutron::SecurityGroup
     properties:
@@ -88,6 +89,7 @@ resources:
         - protocol: icmp
           remote_ip_prefix: 0.0.0.0/0
 
+## routable ports for analyst machines
   analyst_public_port_0:
     type: OS::Neutron::Port
     properties:
@@ -373,6 +375,7 @@ resources:
           networks:
             - network: { get_resource: green_net }
 
+## individual analyst workstations - this template needs to be turned into a pipeline product
   analyst_workstation_0:
     type: OS::Nova::Server
     depends_on: blue_net
