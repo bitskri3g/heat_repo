@@ -1,5 +1,6 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
+ifup ens3;ifup ens4;ifdown ens3;ifdown ens4;ifup ens3;ifup ens4
 echo 127.0.0.1 $(hostname) >> /etc/hosts
 echo 10.223.0.250 SO.internal >> /etc/hosts
 echo 10.222.0.15 home.gmips.gov >> /etc/hosts
@@ -18,7 +19,7 @@ if ((action.id == “org.freedesktop.color-manager.create-device” || action.id
 return polkit.Result.YES;
 }
 });
-__EOF__ 
+__EOF__
 systemctl enable xrdp
 ## ALLOW RDP IN
 iptables -A INPUT -p tcp --dport 3389 -j ACCEPT

@@ -45,11 +45,6 @@ parameters:
     label: password for so user
     description: Password for the 'so' user on both so_master and so_gateway
     default: so
-  analysts:
-    type: number
-    label: number of analysts
-    description: Number of anaylst VMs and floating IPs to create
-    default: 2
 
 resources:
 ## 1.0 Blue Team Network
@@ -77,6 +72,88 @@ resources:
       network: { get_resource: blue_net }
       fixed_ips:
         - ip_address: 10.223.0.250
+
+  analyst_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 1
+          port_range_max: 65535
+        - protocol: udp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 1
+          port_range_max: 65535
+        - protocol: icmp
+          remote_ip_prefix: 0.0.0.0/0
+
+  analyst_public_port_0:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_1:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_2:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_3:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_4:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_5:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_6:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_7:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_8:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_9:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_10:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
 
 ## 1.1 Enterprise Network
   green_net:
@@ -296,22 +373,138 @@ resources:
           networks:
             - network: { get_resource: green_net }
 
-  analyst_workstations:
-    type: OS::Heat::ResourceGroup
+  analyst_workstation_0:
+    type: OS::Nova::Server
     depends_on: blue_net
     properties:
-##Increase count to 11 for group event
-      count: { get_param: analysts }
-      resource_def:
-        type: OS::Nova::Server
-        properties:
-          flavor: cy.mega
-          image: Debian LXQt
-          name: analyst-%index%
-          networks:
-            - network: public
-          user_data: {get_file : "https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh"}
-          user_data_format: RAW
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-0
+      networks:
+        - port: { get_resource: analyst_public_port_0 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_1:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-1
+      networks:
+        - port: { get_resource: analyst_public_port_1 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_2:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-2
+      networks:
+        - port: { get_resource: analyst_public_port_2 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_3:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-3
+      networks:
+        - port: { get_resource: analyst_public_port_3 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_4:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-4
+      networks:
+        - port: { get_resource: analyst_public_port_4 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_5:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-5
+      networks:
+        - port: { get_resource: analyst_public_port_5 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_6:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-6
+      networks:
+        - port: { get_resource: analyst_public_port_6 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_7:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-7
+      networks:
+        - port: { get_resource: analyst_public_port_7 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_8:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-8
+      networks:
+        - port: { get_resource: analyst_public_port_8 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_9:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-9
+      networks:
+        - port: { get_resource: analyst_public_port_9 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_10:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-10
+      networks:
+        - port: { get_resource: analyst_public_port_10 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
 
 ## 3.0 Enterprise Resources
   domain_controller:
