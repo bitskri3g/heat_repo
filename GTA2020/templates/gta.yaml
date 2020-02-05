@@ -535,7 +535,7 @@ resources:
     depends_on: wait_for_domain_completion
     properties:
 ##Increase count to 15 for group event
-      count: 4
+      count: 15
       resource_def:
         type: OS::Nova::Server
         properties:
