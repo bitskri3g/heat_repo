@@ -1,7 +1,7 @@
 heat_template_version: rocky
 description: Georgia Technology Authority Event 2020
 #############################################################
-## Index 
+## Index
 ##
 ## 1.0- Blue Team Networking/ports
 ## 1.1- Enterprise Networking/ports
@@ -47,7 +47,6 @@ parameters:
     default: so
 
 resources:
-
 ## 1.0 Blue Team Network
   blue_net:
     type: OS::Neutron::Net
@@ -73,6 +72,90 @@ resources:
       network: { get_resource: blue_net }
       fixed_ips:
         - ip_address: 10.223.0.250
+
+## allow-all security group for analyst routable addresses
+  analyst_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 1
+          port_range_max: 65535
+        - protocol: udp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 1
+          port_range_max: 65535
+        - protocol: icmp
+          remote_ip_prefix: 0.0.0.0/0
+
+## routable ports for analyst machines
+  analyst_public_port_0:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_1:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_2:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_3:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_4:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_5:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_6:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_7:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_8:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_9:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+  analyst_public_port_10:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
 
 ## 1.1 Enterprise Network
   green_net:
@@ -139,13 +222,13 @@ resources:
       cidr: 200.0.0.0/5
       dns_nameservers:
         - 10.101.255.254
-      gateway_ip: 207.255.255.254 
+      gateway_ip: 207.255.255.254
   red_gateway_port:
     type: OS::Neutron::Port
     properties:
       network: { get_resource: red_net }
       fixed_ips:
-        - ip_address: 207.255.255.254 
+        - ip_address: 207.255.255.254
   kali_1_port:
     type: OS::Neutron::Port
     properties:
@@ -157,7 +240,7 @@ resources:
     properties:
       network: { get_resource: red_net }
       fixed_ips:
-        - ip_address: 207.192.153.100       
+        - ip_address: 207.192.153.100
   kali_3_port:
     type: OS::Neutron::Port
     properties:
@@ -274,24 +357,157 @@ resources:
             $signal_master_complete: { get_attr: [wait_for_master_completion_handle, curl_cli] }
             $username: { get_param: username }
             $userpass: { get_param: userpass }
-            $sopass: { get_param: sopass }      
+            $sopass: { get_param: sopass }
 
-  analyst_workstations:
+  traffic_generators:
     type: OS::Heat::ResourceGroup
+    depends_on: wait_for_gateway_networking
+    properties:
+      count: 10
+      resource_def:
+        type: OS::Zun::Container
+        properties:
+          name: traffic-generator-%index%
+          image: "danielkvist/whisperer"
+          image_driver: docker
+          cpu: 1
+          memory: 512
+          networks:
+            - network: { get_resource: green_net }
+
+## individual analyst workstations - this template needs to be turned into a pipeline product
+  analyst_workstation_0:
+    type: OS::Nova::Server
     depends_on: blue_net
     properties:
-##Increase count to 11 for group event
-      count: 2
-      resource_def:
-        type: OS::Nova::Server
-        properties:
-          flavor: cy.mega
-          image: Debian LXQt
-          name: analyst %index%
-          networks:
-          - network: {get_resource: blue_net}
-          user_data: {get_file : "https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh"}
-          user_data_format: RAW
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-0
+      networks:
+        - port: { get_resource: analyst_public_port_0 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_1:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-1
+      networks:
+        - port: { get_resource: analyst_public_port_1 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_2:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-2
+      networks:
+        - port: { get_resource: analyst_public_port_2 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_3:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-3
+      networks:
+        - port: { get_resource: analyst_public_port_3 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_4:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-4
+      networks:
+        - port: { get_resource: analyst_public_port_4 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_5:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-5
+      networks:
+        - port: { get_resource: analyst_public_port_5 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_6:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-6
+      networks:
+        - port: { get_resource: analyst_public_port_6 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_7:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-7
+      networks:
+        - port: { get_resource: analyst_public_port_7 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_8:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-8
+      networks:
+        - port: { get_resource: analyst_public_port_8 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_9:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-9
+      networks:
+        - port: { get_resource: analyst_public_port_9 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+  analyst_workstation_10:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-10
+      networks:
+        - port: { get_resource: analyst_public_port_10 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
 
 ## 3.0 Enterprise Resources
   domain_controller:
@@ -319,7 +535,7 @@ resources:
     depends_on: wait_for_domain_completion
     properties:
 ##Increase count to 15 for group event
-      count: 4
+      count: 15
       resource_def:
         type: OS::Nova::Server
         properties:
@@ -334,7 +550,8 @@ resources:
               template: {get_file : "https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/lan_host.ps1"}
               params:
                 admin_password: { get_param: domainpass }
-                domain_name: { get_param: domain_netbios_name }
+                domain_name: { get_param: domain_name }
+                domain_netbios_name: { get_param: domain_netbios_name }
                 so_master_address: { get_attr: [blue_master_port, fixed_ips, 0, ip_address] }
 
 ## 4.0 DMZ Resources
@@ -373,11 +590,11 @@ resources:
         git clone https://github.com/iagox86/dnscat2.git
         cd dnscat2/server/
         gem install bundler
-        bundle install 
+        bundle install
         cat > "/etc/apt/sources.list" << __EOF__
         deb http://http.kali.org/kali kali-rolling main non-free contrib
         deb-src http://http.kali.org/kali kali-rolling main non-free contrib
-        __EOF__ 
+        __EOF__
   kali_2:
     type: OS::Nova::Server
     properties:
@@ -396,7 +613,7 @@ resources:
         git clone https://github.com/iagox86/dnscat2.git
         cd dnscat2/server/
         gem install bundler
-        bundle install 
+        bundle install
         cat > "/etc/apt/sources.list" << __EOF__
         deb http://http.kali.org/kali kali-rolling main non-free contrib
         deb-src http://http.kali.org/kali kali-rolling main non-free contrib
@@ -420,7 +637,7 @@ resources:
         cd dnscat2/server/
         gem install bundler
         bundle install
-        wget https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/metaTest/master/Intel/RedTeam/badindex.html -O /root/Desktop/badindex.html  
+        wget https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/metaTest/master/Intel/RedTeam/badindex.html -O /root/Desktop/badindex.html
         cat > "/etc/apt/sources.list" << __EOF__
         deb http://http.kali.org/kali kali-rolling main non-free contrib
         deb-src http://http.kali.org/kali kali-rolling main non-free contrib
@@ -445,7 +662,7 @@ resources:
         git clone https://github.com/iagox86/dnscat2.git
         cd dnscat2/server/
         gem install bundler
-        bundle install 
+        bundle install
         cat > "/etc/apt/sources.list" << __EOF__
         deb http://http.kali.org/kali kali-rolling main non-free contrib
         deb-src http://http.kali.org/kali kali-rolling main non-free contrib
@@ -467,7 +684,7 @@ resources:
         git clone https://github.com/iagox86/dnscat2.git
         cd dnscat2/server/
         gem install bundler
-        bundle install 
+        bundle install
         cat > "/etc/apt/sources.list" << __EOF__
         deb http://http.kali.org/kali kali-rolling main non-free contrib
         deb-src http://http.kali.org/kali kali-rolling main non-free contrib
@@ -483,3 +700,49 @@ resources:
       - network: {get_resource: red_net}
       user_data: {get_file : "https://raw.githubusercontent.com/GA-CyberWorkforceAcademy/heat_repo/master/GTA2020/hostdata/reporter.sh"}
       user_data_format: RAW
+
+outputs:
+  analyst-0-ip:
+    description: The routable IP for analyst 0
+    value:
+      get_attr: [analyst_workstation_0, addresses, public, 0, addr]
+  analyst-1-ip:
+    description: The routable IP for analyst 1
+    value:
+      get_attr: [analyst_workstation_1, addresses, public, 0, addr]
+  analyst-2-ip:
+    description: The routable IP for analyst 2
+    value:
+      get_attr: [analyst_workstation_2, addresses, public, 0, addr]
+  analyst-3-ip:
+    description: The routable IP for analyst 3
+    value:
+      get_attr: [analyst_workstation_3, addresses, public, 0, addr]
+  analyst-4-ip:
+    description: The routable IP for analyst 4
+    value:
+      get_attr: [analyst_workstation_4, addresses, public, 0, addr]
+  analyst-5-ip:
+    description: The routable IP for analyst 5
+    value:
+      get_attr: [analyst_workstation_5, addresses, public, 0, addr]
+  analyst-6-ip:
+    description: The routable IP for analyst 6
+    value:
+      get_attr: [analyst_workstation_6, addresses, public, 0, addr]
+  analyst-7-ip:
+    description: The routable IP for analyst 7
+    value:
+      get_attr: [analyst_workstation_7, addresses, public, 0, addr]
+  analyst-8-ip:
+    description: The routable IP for analyst 8
+    value:
+      get_attr: [analyst_workstation_8, addresses, public, 0, addr]
+  analyst-9-ip:
+    description: The routable IP for analyst 9
+    value:
+      get_attr: [analyst_workstation_9, addresses, public, 0, addr]
+  analyst-10-ip:
+    description: The routable IP for analyst 10
+    value:
+      get_attr: [analyst_workstation_10, addresses, public, 0, addr]
