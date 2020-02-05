@@ -697,3 +697,49 @@ resources:
       - network: {get_resource: red_net}
       user_data: {get_file : "https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/reporter.sh"}
       user_data_format: RAW
+
+outputs:
+  analyst-0-ip:
+    description: The routable IP for analyst 0
+    value:
+      get_attr: [analyst_workstation_0, addresses, public, 0, addr]
+  analyst-1-ip:
+    description: The routable IP for analyst 1
+    value:
+      get_attr: [analyst_workstation_1, addresses, public, 0, addr]
+  analyst-2-ip:
+    description: The routable IP for analyst 2
+    value:
+      get_attr: [analyst_workstation_2, addresses, public, 0, addr]
+  analyst-3-ip:
+    description: The routable IP for analyst 3
+    value:
+      get_attr: [analyst_workstation_3, addresses, public, 0, addr]
+  analyst-4-ip:
+    description: The routable IP for analyst 4
+    value:
+      get_attr: [analyst_workstation_4, addresses, public, 0, addr]
+  analyst-5-ip:
+    description: The routable IP for analyst 5
+    value:
+      get_attr: [analyst_workstation_5, addresses, public, 0, addr]
+  analyst-6-ip:
+    description: The routable IP for analyst 6
+    value:
+      get_attr: [analyst_workstation_6, addresses, public, 0, addr]
+  analyst-7-ip:
+    description: The routable IP for analyst 7
+    value:
+      get_attr: [analyst_workstation_7, addresses, public, 0, addr]
+  analyst-8-ip:
+    description: The routable IP for analyst 8
+    value:
+      get_attr: [analyst_workstation_8, addresses, public, 0, addr]
+  analyst-9-ip:
+    description: The routable IP for analyst 9
+    value:
+      get_attr: [analyst_workstation_9, addresses, public, 0, addr]
+  analyst-10-ip:
+    description: The routable IP for analyst 10
+    value:
+      get_attr: [analyst_workstation_10, addresses, public, 0, addr]
