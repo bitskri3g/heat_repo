@@ -1,6 +1,7 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 ifup ens3;ifup ens4;ifdown ens3;ifdown ens4;ifup ens3;ifup ens4
+echo 'Acquire::http::proxy "http://cache.internal.georgiacyber.org:3142";' > /etc/apt/apt.conf.d/02proxy
 echo 127.0.0.1 $(hostname) >> /etc/hosts
 echo 10.223.0.250 SO.internal >> /etc/hosts
 echo 10.222.0.15 home.gmips.gov >> /etc/hosts
