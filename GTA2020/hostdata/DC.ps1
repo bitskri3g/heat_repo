@@ -102,3 +102,4 @@ While ($break -eq $false)
 
 New-Item -Path "c:\" -Name "notevil" -ItemType "directory"
 New-SmbShare -Name "share" -Path "c:\notevil" -FullAccess "domain_netbios_name\domain users"
+Invoke-WebRequest -Uri 'https://github.com/GA-CyberWorkforceAcademy/metaTest/raw/master/Intel/employee_info.xlsx' -Outfile 'c:\notevil\employee_info.xlsx'
