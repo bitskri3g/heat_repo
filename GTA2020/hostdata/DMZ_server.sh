@@ -10,7 +10,7 @@ sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_
 service ssh restart
 # --install modified metasploitable3
 echo "Setup Metasploitable3"
-apt-get install -y curl git
+apt-get install -y curl git cifs-utils
 git clone https://github.com/GA-CyberWorkforceAcademy/metaTest.git
 curl -L https://omnitruck.chef.io/install.sh | bash -s -- -v 13.8.5
 mkdir /var/chef
@@ -49,6 +49,11 @@ apt-get update && apt-get install wazuh-agent -y
 git clone https://github.com/iagox86/dnscat2.git
 cd dnscat2/client/
 make
+##mount share from DC
+mkdir /mnt/win_share
+username="Adam.Garrett"
+adamPass="CphTH"
+mount -t cifs -o username=$username, password=$adamPass, domain="gmips" //10.221.0.10/share /mnt/win_share
 # --signals completion
 $signal_ms3_complete
 exit 1003
