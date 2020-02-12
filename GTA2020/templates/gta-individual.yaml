@@ -1,0 +1,405 @@
+heat_template_version: rocky
+description: Georgia Technology Authority Event 2020 - Individual
+#############################################################
+## Index
+##
+## 1.0- Blue Team Networking/ports
+## 1.1- Enterprise Networking/ports
+## 1.2- DMZ Networking/ports
+## 1.3- Red Team Networking/ports
+## 1.4- Signals/Handles
+## 2.0- Blue Team Resources
+## 3.0- Enterprise Resources
+## 4.0- DMZ Resources
+## 5.0- Red Team Resources
+#############################################################
+parameters:
+
+  username:
+    type: string
+    label: Security Onion Username
+    description: Username used to log in to various Security Onion services
+    default: gmips
+  userpass:
+    type: string
+    label: Security Onion Password
+    description: Password used to log in to various Security Onion services
+    default: gmips123
+  domainpass:
+    type: string
+    label: Domain Safe Mode Password
+    description: Domain administrator password
+    default: P@ssword123
+  domain_name:
+    type: string
+    label: Domain Name
+    description: Domain name
+    default: gmips.gov
+  domain_netbios_name:
+    type: string
+    label: Domain NetBIOS name
+    description: NetBIOS name for created domain
+    default: gmips
+  sopass:
+    type: string
+    label: password for so user
+    description: Password for the 'so' user on both so_master and so_gateway
+    default: so
+
+resources:
+## 1.0 Blue Team Network
+  blue_net:
+    type: OS::Neutron::Net
+    properties:
+      port_security_enabled: false
+  blue_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: blue_net }
+      cidr: 10.223.0.0/24
+      dns_nameservers:
+        - 10.101.255.254
+      gateway_ip: 10.223.0.254
+  blue_gateway_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: blue_net }
+      fixed_ips:
+        - ip_address: 10.223.0.254
+  blue_master_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: blue_net }
+      fixed_ips:
+        - ip_address: 10.223.0.250
+
+## allow-all security group for analyst routable addresses
+  analyst_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 1
+          port_range_max: 65535
+        - protocol: udp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 1
+          port_range_max: 65535
+        - protocol: icmp
+          remote_ip_prefix: 0.0.0.0/0
+
+## routable ports for analyst machines
+  analyst_public_port_0:
+    type: OS::Neutron::Port
+    properties:
+      network: public
+      security_groups:
+        - { get_resource: analyst_group }
+
+## 1.1 Enterprise Network
+  green_net:
+    type: OS::Neutron::Net
+    properties:
+      port_security_enabled: false
+  green_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: green_net }
+      cidr: 10.221.0.0/24
+      dns_nameservers:
+        - 10.221.0.10
+        - 10.101.255.254
+      gateway_ip: 10.221.0.254
+  green_gateway_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: green_net }
+      fixed_ips:
+        - ip_address: 10.221.0.254
+  green_domain_controller_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: green_net }
+      fixed_ips:
+        - ip_address: 10.221.0.10
+
+## 1.2 DMZ Network
+  white_net:
+    type: OS::Neutron::Net
+    properties:
+      port_security_enabled: false
+  white_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: white_net }
+      cidr: 10.222.0.0/24
+      dns_nameservers:
+        - 10.101.255.254
+      gateway_ip: 10.222.0.254
+  white_gateway_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: white_net }
+      fixed_ips:
+        - ip_address: 10.222.0.254
+  white_server_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: white_net }
+      fixed_ips:
+        - ip_address: 10.222.0.15
+
+## 1.3 Red Team Network
+  red_net:
+    type: OS::Neutron::Net
+    properties:
+      port_security_enabled: false
+  red_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: red_net }
+      cidr: 200.0.0.0/5
+      dns_nameservers:
+        - 10.101.255.254
+      gateway_ip: 207.255.255.254
+  red_gateway_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: red_net }
+      fixed_ips:
+        - ip_address: 207.255.255.254
+  kali_1_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: red_net }
+      fixed_ips:
+        - ip_address: 205.140.100.1
+
+## 1.4 Signals
+## Pause stack creation until gateway is functional
+  wait_for_gateway_networking:
+    type: OS::Heat::WaitCondition
+    properties:
+      timeout: 1200
+      count: 1
+      handle: { get_resource: wait_for_gateway_networking_handle }
+  wait_for_gateway_networking_handle:
+    type: OS::Heat::WaitConditionHandle
+    properties:
+      signal_transport: TOKEN_SIGNAL
+
+## Pause stack creation until SO master is functional
+  wait_for_master_completion:
+    type: OS::Heat::WaitCondition
+    properties:
+      timeout: 1800
+      count: 1
+      handle: { get_resource: wait_for_master_completion_handle }
+  wait_for_master_completion_handle:
+    type: OS::Heat::WaitConditionHandle
+    properties:
+      signal_transport: TOKEN_SIGNAL
+
+## Pause stack creation until Domain controller is functional
+  wait_for_domain_completion:
+    type: OS::Heat::WaitCondition
+    properties:
+      timeout: 1800
+      count: 1
+      handle: { get_resource: wait_for_domain_completion_handle }
+  wait_for_domain_completion_handle:
+    type: OS::Heat::WaitConditionHandle
+    properties:
+      signal_transport: TOKEN_SIGNAL
+
+## Pause stack creation until ms3 is functional
+  wait_for_ms3_completion:
+    type: OS::Heat::WaitCondition
+    properties:
+      timeout: 1800
+      count: 1
+      handle: { get_resource: wait_for_ms3_completion_handle }
+  wait_for_ms3_completion_handle:
+    type: OS::Heat::WaitConditionHandle
+    properties:
+      signal_transport: TOKEN_SIGNAL
+
+## Pause stack creation until gateway is fully functional
+  wait_for_so_gateway_final_completion:
+    type: OS::Heat::WaitCondition
+    properties:
+      timeout: 3600
+      count: 1
+      handle: { get_resource: wait_for_so_gateway_final_completion_handle }
+  wait_for_so_gateway_final_completion_handle:
+    type: OS::Heat::WaitConditionHandle
+    properties:
+      signal_transport: TOKEN_SIGNAL
+
+## 2.0 Blue Team Resources
+## gateway serves as core router and SO heavy node/sensor for attached networks
+  gateway:
+    type: OS::Nova::Server
+    properties:
+      name: so_gateway
+      flavor: hack.massive
+      networks:
+        - port: { get_resource: red_gateway_port } #ens3
+        - port: { get_resource: green_gateway_port } #ens4
+        - port: { get_resource: white_gateway_port } #ens5
+        - port: { get_resource: blue_gateway_port } #ens6
+        - network: Public #ens7
+      image: "Security Onion"
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: {get_file : "https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/SO_gateway.sh"}
+          params:
+            $signal_gateway_networking_complete: { get_attr: [wait_for_gateway_networking_handle, curl_cli] }
+            $signal_gateway_final_complete: { get_attr: [wait_for_so_gateway_final_completion_handle, curl_cli] }
+            $so_master_address: { get_attr: [blue_master_port, fixed_ips, 0, ip_address] }
+            $sopass: { get_param: sopass }
+
+  so_master:
+    type: OS::Nova::Server
+    depends_on: wait_for_gateway_networking
+    properties:
+      name: so_master
+      flavor: hack.massive
+      networks:
+        - port: { get_resource: blue_master_port }
+      image: "Security Onion"
+      config_drive: true
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: {get_file : "https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/SO_master.sh"}
+          params:
+            $signal_master_complete: { get_attr: [wait_for_master_completion_handle, curl_cli] }
+            $username: { get_param: username }
+            $userpass: { get_param: userpass }
+            $sopass: { get_param: sopass }
+
+  traffic_generators:
+    type: OS::Heat::ResourceGroup
+    depends_on: wait_for_gateway_networking
+    properties:
+      count: 10
+      resource_def:
+        type: OS::Zun::Container
+        properties:
+          name: traffic-generator-%index%
+          image: "danielkvist/whisperer"
+          image_driver: docker
+          cpu: 1
+          memory: 512
+          networks:
+            - network: { get_resource: green_net }
+
+## individual analyst workstations - this template needs to be turned into a pipeline product
+  analyst_workstation_0:
+    type: OS::Nova::Server
+    depends_on: blue_net
+    properties:
+      flavor: cy.mega
+      image: Debian LXQt
+      name: analyst-workstation-0
+      networks:
+        - port: { get_resource: analyst_public_port_0 }
+        - network: { get_resource: blue_net }
+      user_data: {get_file : https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/analyst_host.sh}
+      user_data_format: RAW
+
+## 3.0 Enterprise Resources
+  domain_controller:
+    type: OS::Nova::Server
+    depends_on: wait_for_gateway_networking
+    properties:
+      name: domain_controller
+      flavor: cy.large
+      networks:
+        - port: { get_resource: green_domain_controller_port }
+      image: Windows Server 2016 DE
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: {get_file : "https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/DC.ps1"}
+          params:
+            safe_mode_administrator_password: { get_param: domainpass }
+            domain_name: { get_param: domain_name }
+            domain_netbios_name: { get_param: domain_netbios_name }
+            $xauthtoken: { get_attr: [wait_for_domain_completion_handle, token] }
+            $endpoint: { get_attr: [wait_for_domain_completion_handle, endpoint] }
+
+  windows_workstations:
+    type: OS::Heat::ResourceGroup
+    depends_on: wait_for_domain_completion
+    properties:
+##Increase count to 15 for group event
+      count: 3
+      resource_def:
+        type: OS::Nova::Server
+        properties:
+          name: Windows 10 Workstation %index%
+          flavor: cy.mega
+          networks:
+            - network: { get_resource: green_net }
+          image: Windows 10 Enterprise
+          user_data_format: RAW
+          user_data:
+            str_replace:
+              template: {get_file : "https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/lan_host.ps1"}
+              params:
+                admin_password: { get_param: domainpass }
+                domain_name: { get_param: domain_name }
+                domain_netbios_name: { get_param: domain_netbios_name }
+                so_master_address: { get_attr: [blue_master_port, fixed_ips, 0, ip_address] }
+
+## 4.0 DMZ Resources
+  DMZ_server:
+    type: OS::Nova::Server
+    depends_on: wait_for_gateway_networking
+    properties:
+      name: DMZ-Server
+      flavor: cy.large
+      networks:
+        - port: { get_resource: white_server_port }
+      image: Ubuntu 14.04
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: {get_file : "https://raw.githubusercontent.com/bitskri3g/heat_repo/master/GTA2020/hostdata/DMZ_server.sh"}
+          params:
+            $signal_ms3_complete: { get_attr: [wait_for_ms3_completion_handle, curl_cli] }
+            $so_master_address: { get_attr: [blue_master_port, fixed_ips, 0, ip_address] }
+
+## 5.0 Red Team Resources
+  kali_1:
+    type: OS::Nova::Server
+    properties:
+      name: Kali-1
+      flavor: hack.massive
+      networks:
+        - port: { get_resource: kali_1_port }
+      image: Kali Rolling
+      user_data_format: RAW
+      user_data: |
+        #!/bin/bash
+        echo "root:toor" | chpasswd
+        apt-get update
+        apt-get install gem ruby-dev
+        git clone https://github.com/iagox86/dnscat2.git
+        cd dnscat2/server/
+        gem install bundler
+        bundle install
+        cat > "/etc/apt/sources.list" << __EOF__
+        deb http://http.kali.org/kali kali-rolling main non-free contrib
+        deb-src http://http.kali.org/kali kali-rolling main non-free contrib
+        __EOF__
+
+outputs:
+  analyst-0-ip:
+    description: The routable IP for analyst 0
+    value:
+      get_attr: [analyst_workstation_0, addresses, public, 0, addr]
