@@ -1,12 +1,13 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 ifup ens3;ifup ens4;ifdown ens3;ifdown ens4;ifup ens3;ifup ens4
+ip route add 10.221.0.0/24 via 10.223.0.254 dev ens4
 echo 'Acquire::http::proxy "http://cache.internal.georgiacyber.org:3142";' > /etc/apt/apt.conf.d/02proxy
 echo 127.0.0.1 $(hostname) >> /etc/hosts
 echo 10.223.0.250 SO.internal >> /etc/hosts
 echo 10.222.0.15 home.gmips.gov >> /etc/hosts
 echo 202.10.153.4 pwned_you_good.net >> /etc/hosts
-apt-get -y update && apt-get install -y gtk2.0 build-essential git wireshark nmap xrdp
+apt-get -y update && apt-get install -y freerdp2-x11 gtk2.0 build-essential git wireshark nmap xrdp
 git clone https://github.com/vanhauser-thc/thc-hydra.git && cd thc-hydra && ./configure && make install
 #---CREATE CLIENT USER
 useradd analyst -m -U -s /bin/bash; usermod -aG sudo analyst
