@@ -378,7 +378,7 @@ resources:
 ## individual analyst workstations - this template needs to be turned into a pipeline product
   analyst_workstation_0:
     type: OS::Nova::Server
-    depends_on: blue_net
+    depends_on: [blue_net, wait_for_gateway_networking]
     properties:
       flavor: hack.c2.m8192.d128
       image: Debian LXQt
@@ -390,7 +390,7 @@ resources:
       user_data_format: RAW
   analyst_workstation_1:
     type: OS::Nova::Server
-    depends_on: blue_net
+    depends_on: [blue_net, wait_for_gateway_networking]
     properties:
       flavor: hack.c2.m8192.d128
       image: Debian LXQt
@@ -402,7 +402,7 @@ resources:
       user_data_format: RAW
   analyst_workstation_2:
     type: OS::Nova::Server
-    depends_on: blue_net
+    depends_on: [blue_net, wait_for_gateway_networking]
     properties:
       flavor: hack.c2.m8192.d128
       image: Debian LXQt
@@ -414,7 +414,7 @@ resources:
       user_data_format: RAW
   analyst_workstation_3:
     type: OS::Nova::Server
-    depends_on: blue_net
+    depends_on: [blue_net, wait_for_gateway_networking]
     properties:
       flavor: hack.c2.m8192.d128
       image: Debian LXQt
@@ -426,7 +426,7 @@ resources:
       user_data_format: RAW
   analyst_workstation_4:
     type: OS::Nova::Server
-    depends_on: blue_net
+    depends_on: [blue_net, wait_for_gateway_networking]
     properties:
       flavor: hack.c2.m8192.d128
       image: Debian LXQt
@@ -438,7 +438,7 @@ resources:
       user_data_format: RAW
   analyst_workstation_5:
     type: OS::Nova::Server
-    depends_on: blue_net
+    depends_on: [blue_net, wait_for_gateway_networking]
     properties:
       flavor: hack.c2.m8192.d128
       image: Debian LXQt
@@ -450,7 +450,7 @@ resources:
       user_data_format: RAW
   analyst_workstation_6:
     type: OS::Nova::Server
-    depends_on: blue_net
+    depends_on: [blue_net, wait_for_gateway_networking]
     properties:
       flavor: hack.c2.m8192.d128
       image: Debian LXQt
@@ -462,7 +462,7 @@ resources:
       user_data_format: RAW
   analyst_workstation_7:
     type: OS::Nova::Server
-    depends_on: blue_net
+    depends_on: [blue_net, wait_for_gateway_networking]
     properties:
       flavor: hack.c2.m8192.d128
       image: Debian LXQt
@@ -474,7 +474,7 @@ resources:
       user_data_format: RAW
   analyst_workstation_8:
     type: OS::Nova::Server
-    depends_on: blue_net
+    depends_on: [blue_net, wait_for_gateway_networking]
     properties:
       flavor: hack.c2.m8192.d128
       image: Debian LXQt
@@ -486,7 +486,7 @@ resources:
       user_data_format: RAW
   analyst_workstation_9:
     type: OS::Nova::Server
-    depends_on: blue_net
+    depends_on: [blue_net, wait_for_gateway_networking]
     properties:
       flavor: hack.c2.m8192.d128
       image: Debian LXQt
@@ -498,7 +498,7 @@ resources:
       user_data_format: RAW
   analyst_workstation_10:
     type: OS::Nova::Server
-    depends_on: blue_net
+    depends_on: [blue_net, wait_for_gateway_networking]
     properties:
       flavor: hack.c2.m8192.d128
       image: Debian LXQt
@@ -575,6 +575,7 @@ resources:
 ## 5.0 Red Team Resources
   kali_1:
     type: OS::Nova::Server
+    depends_on: wait_for_gateway_networking
     properties:
       name: Kali-1
       flavor: hack.c4.m16384.d128
@@ -597,6 +598,7 @@ resources:
         __EOF__
   kali_2:
     type: OS::Nova::Server
+    depends_on: wait_for_gateway_networking
     properties:
       name: Kali-2
       flavor: hack.c4.m16384.d128
@@ -620,6 +622,7 @@ resources:
         __EOF__
   kali_3:
     type: OS::Nova::Server
+    depends_on: wait_for_gateway_networking
     properties:
       name: Kali-3
       flavor: hack.c4.m16384.d128
@@ -647,6 +650,7 @@ resources:
         python3 -m http.server
   kali_4:
     type: OS::Nova::Server
+    depends_on: wait_for_gateway_networking
     properties:
       name: Kali-4
       flavor: hack.c4.m16384.d128
@@ -669,6 +673,7 @@ resources:
         __EOF__
   kali_extra:
     type: OS::Nova::Server
+    depends_on: wait_for_gateway_networking    
     properties:
       name: Kali-extra
       flavor: hack.c4.m16384.d128
