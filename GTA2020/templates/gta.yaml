@@ -321,7 +321,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: so_gateway
-      flavor: hack.massive
+      flavor: hack.c4.m16384.d128
       networks:
         - port: { get_resource: red_gateway_port } #ens3
         - port: { get_resource: green_gateway_port } #ens4
@@ -344,7 +344,7 @@ resources:
     depends_on: wait_for_gateway_networking
     properties:
       name: so_master
-      flavor: hack.massive
+      flavor: hack.c4.m16384.d128
       networks:
         - port: { get_resource: blue_master_port }
       image: "Security Onion"
@@ -380,7 +380,7 @@ resources:
     type: OS::Nova::Server
     depends_on: blue_net
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: analyst-workstation-0
       networks:
@@ -392,7 +392,7 @@ resources:
     type: OS::Nova::Server
     depends_on: blue_net
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: analyst-workstation-1
       networks:
@@ -404,7 +404,7 @@ resources:
     type: OS::Nova::Server
     depends_on: blue_net
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: analyst-workstation-2
       networks:
@@ -416,7 +416,7 @@ resources:
     type: OS::Nova::Server
     depends_on: blue_net
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: analyst-workstation-3
       networks:
@@ -428,7 +428,7 @@ resources:
     type: OS::Nova::Server
     depends_on: blue_net
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: analyst-workstation-4
       networks:
@@ -440,7 +440,7 @@ resources:
     type: OS::Nova::Server
     depends_on: blue_net
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: analyst-workstation-5
       networks:
@@ -452,7 +452,7 @@ resources:
     type: OS::Nova::Server
     depends_on: blue_net
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: analyst-workstation-6
       networks:
@@ -464,7 +464,7 @@ resources:
     type: OS::Nova::Server
     depends_on: blue_net
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: analyst-workstation-7
       networks:
@@ -476,7 +476,7 @@ resources:
     type: OS::Nova::Server
     depends_on: blue_net
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: analyst-workstation-8
       networks:
@@ -488,7 +488,7 @@ resources:
     type: OS::Nova::Server
     depends_on: blue_net
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: analyst-workstation-9
       networks:
@@ -500,7 +500,7 @@ resources:
     type: OS::Nova::Server
     depends_on: blue_net
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: analyst-workstation-10
       networks:
@@ -515,7 +515,7 @@ resources:
     depends_on: wait_for_gateway_networking
     properties:
       name: domain_controller
-      flavor: cy.large
+      flavor: hack.c4.m8192.d128
       networks:
         - port: { get_resource: green_domain_controller_port }
       image: Windows Server 2016 DE
@@ -540,7 +540,7 @@ resources:
         type: OS::Nova::Server
         properties:
           name: Windows 10 Workstation %index%
-          flavor: cy.mega
+          flavor: hack.c2.m8192.d128
           networks:
             - network: { get_resource: green_net }
           image: Windows 10 Enterprise
@@ -560,7 +560,7 @@ resources:
     depends_on: wait_for_gateway_networking
     properties:
       name: DMZ-Server
-      flavor: cy.large
+      flavor: hack.c4.m8192.d128
       networks:
         - port: { get_resource: white_server_port }
       image: Ubuntu 14.04
@@ -577,7 +577,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: Kali-1
-      flavor: hack.massive
+      flavor: hack.c4.m16384.d128
       networks:
         - port: { get_resource: kali_1_port }
       image: Kali Rolling
@@ -599,7 +599,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: Kali-2
-      flavor: hack.massive
+      flavor: hack.c4.m16384.d128
       networks:
         - port: { get_resource: kali_2_port }
       image: Kali Rolling
@@ -622,7 +622,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: Kali-3
-      flavor: hack.massive
+      flavor: hack.c4.m16384.d128
       networks:
         - port: { get_resource: kali_3_port }
       image: Kali Rolling
@@ -649,7 +649,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: Kali-4
-      flavor: hack.massive
+      flavor: hack.c4.m16384.d128
       networks:
         - port: { get_resource: kali_4_port }
       image: Kali Rolling
@@ -671,7 +671,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: Kali-extra
-      flavor: hack.massive
+      flavor: hack.c4.m16384.d128
       networks:
         - network: { get_resource: red_net }
       image: Kali Rolling
@@ -693,7 +693,7 @@ resources:
     type: OS::Nova::Server
     depends_on: wait_for_gateway_networking
     properties:
-      flavor: cy.mega
+      flavor: hack.c2.m8192.d128
       image: Debian LXQt
       name: reporter host
       networks:
