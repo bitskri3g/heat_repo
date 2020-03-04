@@ -12,14 +12,14 @@ $user.SetPassword('safe_mode_administrator_password')
 Import-Module ADDSDeployment
 $safeModePwd = (ConvertTo-SecureString 'safe_mode_administrator_password' -AsPlainText -Force)
 Install-ADDSForest -DomainName 'domain_name' -DomainNetbiosName 'domain_netbios_name' -SafeModeAdministratorPassword $safeModePwd -InstallDns -NoRebootOnCompletion -Force
-Set-DnsServerForwarder -IPAddress "10.101.255.254" -PassThru
-[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11"
-Invoke-WebRequest -Method POST -Headers @{"X-Auth-Token" = "$xauthtoken" ; "Content-Type" = "application/json" ; "Accept" = "application/json"} -Uri $endpoint -UseBasicParsing
 New-Item -ItemType file domain_done
 exit 1003
 }
 
 if (!(Test-Path users_done)) {
+Set-DnsServerForwarder -IPAddress "10.101.255.254" -PassThru
+[Net.ServicePointManager]::SecurityProtocol = "tls12, tls11"
+Invoke-WebRequest -Method POST -Headers @{"X-Auth-Token" = "$xauthtoken" ; "Content-Type" = "application/json" ; "Accept" = "application/json"} -Uri $endpoint -UseBasicParsing
 $password = (ConvertTo-SecureString 'safe_mode_administrator_password' -AsPlainText -Force)
 $cred = New-Object System.Management.Automation.PSCredential ("domain_name\administrator", $password)
 Import-Module ActiveDirectory
