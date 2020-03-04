@@ -169,7 +169,6 @@ resources:
       cidr: 10.221.0.0/24
       dns_nameservers:
         - 10.221.0.10
-        - 10.101.255.254
       gateway_ip: 10.221.0.254
   green_gateway_port:
     type: OS::Neutron::Port
@@ -673,7 +672,7 @@ resources:
         __EOF__
   kali_extra:
     type: OS::Nova::Server
-    depends_on: wait_for_gateway_networking    
+    depends_on: wait_for_gateway_networking
     properties:
       name: Kali-extra
       flavor: hack.c4.m16384.d128

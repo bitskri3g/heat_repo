@@ -21,6 +21,7 @@ exit 1003
 if (!(Test-Path users_done)) {
 $password = (ConvertTo-SecureString 'safe_mode_administrator_password' -AsPlainText -Force)
 $cred = New-Object System.Management.Automation.PSCredential ("domain_name\administrator", $password)
+Set-DnsServerForwarder -IPAddress "10.101.255.254" -PassThru
 Import-Module ActiveDirectory
 
 ## First boot of new DC takes awhile.. try until success for up to 10 minutes.
